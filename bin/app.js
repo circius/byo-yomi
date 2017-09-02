@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 2);
+/******/ 	return __webpack_require__(__webpack_require__.s = 4);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -1309,7 +1309,7 @@ m.vnode = Vnode
 if (true) module["exports"] = m
 else window.m = m
 }());
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3).setImmediate, __webpack_require__(1)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5).setImmediate, __webpack_require__(1)))
 
 /***/ }),
 /* 1 */
@@ -1342,16 +1342,87 @@ module.exports = g;
 /* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
+const m = __webpack_require__(0);
+const time = __webpack_require__(3)
+
+const formatSecs = function (n) {
+	return n > 9? "" + n : "0" + n;
+}
+
+const formatMinSecs = function (n) {
+	const mins = Math.floor(n/60);
+	const secs = formatSecs(n - mins * 60);
+	return (mins + ":" + secs);
+}
+
+const formatByo = function (a) {
+	return '+' + a[0] + 'x' + a[1] + 's';
+}
+
+module.exports = {
+	view: function(vnode) {
+		const player = vnode.attrs.player;
+		const playerTime = time[player]
+		return m("."+player+'-clock', [
+			m(".main", formatMinSecs(playerTime.main)),
+			m(".byo", formatByo([playerTime.byoN, playerTime.byo]))
+			])
+	},
+}
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+let m = __webpack_require__(0)
+let settings = __webpack_require__(9)
+
+function Time(main, byo, byoN){
+	this.main = 60*main;
+	this.byo = byo;
+	this.byoN = byoN;
+}
+
+let times = {
+
+	black: new Time(.1,5,5),
+	white: new Time(10,5,5),
+
+	count : function(player) {
+		let cur = times[player]
+		if (cur.main > 0) {
+			cur.main -= 1;
+		} else if (cur.byoN > 0) {
+			cur.main = cur.byo;
+			cur.byoN -=1;
+		} else if(cur.byoN === 0) {
+			return 'end';
+		}
+	
+// 	count: function(player, time) {
+
+
+// 		let current = times[player]
+// 		current[time] -= 1;
+// }
+}
+}
+module.exports = times
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
 let m = __webpack_require__(0);
 
-let clocks = __webpack_require__(6);
-let clock = __webpack_require__(7)
+let clocks = __webpack_require__(8);
+let clock = __webpack_require__(2)
 let menu = __webpack_require__(10);
 
 m.mount(document.body, clocks)
 
 /***/ }),
-/* 3 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var apply = Function.prototype.apply;
@@ -1404,13 +1475,13 @@ exports._unrefActive = exports.active = function(item) {
 };
 
 // setimmediate attaches itself to the global object
-__webpack_require__(4);
+__webpack_require__(6);
 exports.setImmediate = setImmediate;
 exports.clearImmediate = clearImmediate;
 
 
 /***/ }),
-/* 4 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
@@ -1600,10 +1671,10 @@ exports.clearImmediate = clearImmediate;
     attachTo.clearImmediate = clearImmediate;
 }(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(5)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(7)))
 
 /***/ }),
-/* 5 */
+/* 7 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -1793,64 +1864,33 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
-let m = __webpack_require__(0)
-let clock = __webpack_require__(7)
-const players = ["black", "white"];
-
-module.exports = {
-	view: function() {
-		return m(".clocks", [
-			m(".black", m(clock, {player:"black"})),
-			m(".white", m(clock, {player:"white"}))
-		])
-}
-};
-
-/***/ }),
-/* 7 */
-/***/ (function(module, exports, __webpack_require__) {
-
-const m = __webpack_require__(0);
-const time = __webpack_require__(8)
-
-module.exports = {
-	view: function(vnode) {
-		const player = vnode.attrs.player;
-		const playerTime = time[player]
-		return m("."+player, [
-
-			m(".main", playerTime.main),
-			m(".byoX", playerTime.byoX),
-			m(".byoN", playerTime.byoN)
-			]);
-	}
-};
-
-/***/ }),
 /* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 let m = __webpack_require__(0)
-let settings = __webpack_require__(9)
+const clock = __webpack_require__(2)
+const time = __webpack_require__(3)
 
-function Time(main, byoX, byoN){
-	this.main = main;
-	this.byoX = byoX;
-	this.byoN = byoN;
+const players = ["black", "white"];
+let current = 0
+
+function counter(){
+	setInterval(function(){
+		let count = time.count('black')
+		if (count === 'end') {alert('zing')}
+		m.redraw()
+}, 1000)
 }
 
-let times = {
-	//init 
-	black: new Time(10,5,5),
-	white: new Time(10,5,5),
-	//interface
+module.exports = {
+	oninit: counter,
+	view: function() {
+		return m(".clocks", [
+			m(".black", m(clock, {player:"black"})),
+			m(".white", m(clock, {player:"white"})),
+		])
 }
-
-
-module.exports = times
+};
 
 /***/ }),
 /* 9 */
@@ -1866,7 +1906,7 @@ let m = __webpack_require__(0)
 
 module.exports = {
 	view: function() {
-		return m(".menu")
+		return m(".menu", m)
 	}
 };
 
