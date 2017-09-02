@@ -1,0 +1,28 @@
+{
+  "name": "byo-yomi",
+  "version": "1.0.0",
+  "description": "byo-yomi timer built with mithril",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack src/index.js bin/app.js --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/circius/byo-yomi.git"
+  },
+  "keywords": [
+    "timer",
+    "byo-yomi"
+  ],
+  "author": "circius",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/circius/byo-yomi/issues"
+  },
+  "homepage": "https://github.com/circius/byo-yomi#readme",
+  "devDependencies": {
+    "mithril": "^1.1.3",
+    "webpack": "^3.5.5"
+  }
+}
