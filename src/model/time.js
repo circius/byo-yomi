@@ -1,16 +1,29 @@
-let m = require("mithril")
-let settings = require("./settings")
+const m = require("mithril")
+const s = require("./settings")
 
-function Time(main, byo, byoN){
+
+
+function Time([main, byo, byoN]){
 	this.main = 60*main;
 	this.byo = byo;
 	this.byoN = byoN;
 }
 
+
 let times = {
 
-	black: new Time(.1,5,5),
-	white: new Time(10,5,5),
+	settings: [],
+
+	loadSettings: function() {
+	return times.settings = s.time.map(category => settings.append(category.initial));
+	},
+
+	loadTimes: function (){
+		times.loadSettings;
+		times.black = new Time(times.settings);
+		times.white = new Time(times.settings);
+		return
+	},
 
 	count : function(player) {
 		let cur = times[player]

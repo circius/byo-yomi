@@ -1,7 +1,17 @@
-let m = require("mithril");
+const m = require("mithril");
 
-let clocks = require("./view/clocks");
-let clock = require("./view/clock")
-let menu = require("./view/menu");
+const clocks = require("./view/clocks");
+const menu = require("./view/menu");
 
-m.mount(document.body, clocks)
+m.route(document.body, "/menu", {
+	"/menu": {
+		render: () => {
+			return m(menu)
+		}
+	},
+	"/clocks": {
+		render: () => {
+			return m(clocks)
+		}
+	}
+})

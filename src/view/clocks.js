@@ -1,13 +1,14 @@
 let m = require("mithril")
 const clock = require("./clock")
 const time = require("../model/time")
+const settings = require("../model/settings")
 
-const players = ["black", "white"];
-let current = 0
+const players = settings.players;
+let current = 0;
 
 function counter(){
 	setInterval(function(){
-		let count = time.count('black')
+		let count = time.count(players[current])
 		if (count === 'end') {alert('zing')}
 		m.redraw()
 }, 1000)

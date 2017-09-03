@@ -16,6 +16,9 @@ const formatByo = function (a) {
 }
 
 module.exports = {
+
+	oninit: function () {time.loadTimes},
+
 	view: function(vnode) {
 		const player = vnode.attrs.player;
 		const playerTime = time[player]

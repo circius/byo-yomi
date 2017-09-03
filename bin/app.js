@@ -1360,6 +1360,9 @@ const formatByo = function (a) {
 }
 
 module.exports = {
+
+	oninit: function () {time.loadTimes},
+
 	view: function(vnode) {
 		const player = vnode.attrs.player;
 		const playerTime = time[player]
@@ -1374,19 +1377,32 @@ module.exports = {
 /* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
-let m = __webpack_require__(0)
-let settings = __webpack_require__(9)
+const m = __webpack_require__(0)
+const s = __webpack_require__(9)
 
-function Time(main, byo, byoN){
+
+
+function Time([main, byo, byoN]){
 	this.main = 60*main;
 	this.byo = byo;
 	this.byoN = byoN;
 }
 
+
 let times = {
 
-	black: new Time(.1,5,5),
-	white: new Time(10,5,5),
+	settings: [],
+
+	loadSettings: function() {
+		return times.settings = s.time.map(category => settings.append(category.initial));
+	},
+
+	loadTimes: function (){
+		times.loadSettings;
+		times.black = new Time(times.settings);
+		times.white = new Time(times.settings);
+		return
+	},
 
 	count : function(player) {
 		let cur = times[player]
@@ -1413,13 +1429,23 @@ module.exports = times
 /* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
-let m = __webpack_require__(0);
+const m = __webpack_require__(0);
 
-let clocks = __webpack_require__(8);
-let clock = __webpack_require__(2)
-let menu = __webpack_require__(10);
+const clocks = __webpack_require__(8);
+const menu = __webpack_require__(10);
 
-m.mount(document.body, clocks)
+m.route(document.body, "/menu", {
+	"/menu": {
+		render: () => {
+			return m(menu)
+		}
+	},
+	"/clocks": {
+		render: () => {
+			return m(clocks)
+		}
+	}
+})
 
 /***/ }),
 /* 5 */
@@ -1870,13 +1896,14 @@ process.umask = function() { return 0; };
 let m = __webpack_require__(0)
 const clock = __webpack_require__(2)
 const time = __webpack_require__(3)
+const settings = __webpack_require__(9)
 
-const players = ["black", "white"];
-let current = 0
+const players = settings.players;
+let current = 0;
 
 function counter(){
 	setInterval(function(){
-		let count = time.count('black')
+		let count = time.count(players[current])
 		if (count === 'end') {alert('zing')}
 		m.redraw()
 }, 1000)
@@ -1894,9 +1921,32 @@ module.exports = {
 
 /***/ }),
 /* 9 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
+const m = __webpack_require__(0)
 
+let settings = {
+
+    time: {
+
+        main: {
+            options: [5, 10, 15, 20, 30, 45],
+            initial: 10,
+        },
+
+        byo: {
+            options: [10, 20, 30, 45, 60],
+            initial: 30
+        },
+        byoN: {
+            options: [5, 10],
+            initial: 5
+        }
+    },
+    players: ['black', 'white']
+};
+
+module.exports = settings
 
 /***/ }),
 /* 10 */
@@ -1906,7 +1956,7 @@ let m = __webpack_require__(0)
 
 module.exports = {
 	view: function() {
-		return m(".menu", m)
+		return m(".menu")
 	}
 };
 
