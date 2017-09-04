@@ -1,0 +1,277 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>byo-yomi clock</title>
+</head>
+
+<body>
+    <div class="menu">
+        <span>main-time:</span>
+        <select class = "maintime-menu" category="maintime" onchange="update_main(this.value)">
+            <optgroup class="maintime-optgroup"></optgroup>
+        </select> <span>mins</span>
+        <br/><br/>
+        <span>byo-yomi:</span>
+        <select class = "byox-menu" category="byo_x" onchange="update_byox(this.value)">
+            <optgroup class="byo-x-optgroup"></optgroup>
+        </select> <span> x </span>
+        <select class = "byon-menu" category="byo-n" onchange="update_byon(this.value)">
+         <optgroup class="byo-n-optgroup"></optgroup></select> <span> secs</span>
+         <br/><br/>
+        <button class="start">go</button>
+    </div>
+    <div class="clocks">
+        <div class="player black">
+            <span class="maintime first-maintime">
+    10:00 
+    </span>
+            <span class="byo-yomi first-byo-yomi"> + 5 x 30s</span>
+        </div>
+        <div class="divider"> </div>
+        <div class="player white">
+            <span class="maintime second-maintime">
+    10:00
+    </span>
+            <span class="byo-yomi second-byo-yomi"> + 5 x 30s</span>
+        </div>
+</body>
+<style>
+body {
+    background: #eeeeee;
+    font-family: 'Helvetica neue', Helvetica, sans-serif;
+    font-size: 4vw;
+    font-variant: small-caps;
+}
+
+.menu {
+    height: 100vh;
+    width: 100vh;
+    position: fixed;
+    margin: 10%;
+    background: #eeeeee;
+    z-index: 2;
+    font-size: 4vw;
+    visibility: visible;
+}
+
+
+select,
+optgroup,
+button {
+    font-size: 4vw;
+    font-variant: small-caps;
+    border-radius: .2em;
+    display: ;
+}
+
+.clocks {
+    margin: 10%;
+    height: auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    visibility: hidden;
+}
+
+.player {
+    background: #aa77cc;
+    font-size: 14vw;
+    padding: .2em;
+    border-radius: .2em;
+}
+
+.byo-yomi {
+    font-variant: small-caps;
+    font-size: 4vw;
+}
+
+.white {
+    background: #eeeeee;
+    color: #222222;
+    border: #222222;
+}
+
+.black {
+    background: #222222;
+    color: #eeeeee;
+}
+
+.divider {
+    height: auto;
+    min-width: 1em;
+}
+
+.current {
+    border: solid .1em;
+    border-color: #DE704F;
+}
+
+$
+</style>
+<script>
+
+// todo: write the button javascript to get through the settings, out of the menu, and into the game.
+
+function Clock(player, maintime, byo) {
+    this.player = player;
+    this.maintime = maintime * 60;
+    this.byoN = byo[0];
+    this.byotime = byo[1]
+    this.mainClock = player.children[0];
+    this.byoClock = player.children[1];
+
+    this.writeClock = function() {
+        this.mainClock.innerHTML = this.formatMinSecs(this.maintime );
+        this.byoClock.innerHTML = this.formatByo([this.byoN, this.byotime]);
+    }
+
+    this.countDown = function() {
+        if (this.maintime > 0) {
+            this.maintime = this.maintime - 1;
+            this.writeClock();
+            return;
+        } else if (this.byoN > 0) {
+            this.maintime += this.byotime;
+            this.byoN -= 1;
+        } else if (this.byoN === 0) {
+            this.finish();
+        }
+        this.writeClock();
+        return;
+    }
+
+    this.resetByo = function() {
+        this.byotime = byo[1];
+        this.writeClock();
+    }
+    this.finish = function() {
+        confirm('over! reload?') ? location.reload() : null;
+    }
+
+    this.formatSecs = function(n) {
+        return n > 9 ? "" + n : "0" + n;
+    }
+    this.formatMinSecs = function(n) {
+        const mins = Math.floor(n / 60);
+        const secs = this.formatSecs(n - mins * 60);
+        return (mins + ":" + secs);
+    }
+    this.formatByo = function(a) {
+        return ' +' + a[0] + 'x' + a[1] + 's';
+    }
+
+}
+
+function counter() {
+    players[current].countDown();
+    return;
+}
+
+function switch_current() {
+    current = window.current;
+    players[current].player.classList.remove("current");
+    players[current].resetByo();
+    current > 0 ? current = 0 : current = 1;
+    players[current].player.classList.add("current");
+    return;
+}
+
+const game_init = function(maintime, byox, byon) {
+    document.querySelector('.menu').style.visibility = 'hidden';
+    document.querySelector('.clocks').style.visibility = 'visible';
+
+
+    const black = document.querySelector(".black");
+    const white = document.querySelector(".white");
+
+    const blackClock = new Clock(black, maintime, [byox, byon]);
+    const whiteClock = new Clock(white, maintime, [byox, byon]);
+
+    blackClock.writeClock();
+    whiteClock.writeClock();
+
+    players = [blackClock, whiteClock];
+    current = 0;
+    players[current].player.classList.add("current");
+    setInterval(counter, 1000);
+    window.addEventListener('keyup', switch_current);
+    window.addEventListener('touchend', switch_current);
+
+
+};
+
+const build_select_menu = function (menu, options, initial) {
+//    let target_menu = document.querySelector(`${menu}`);
+    options.map(option => {
+        let node = document.createElement("option");
+        let textnode = document.createTextNode(`${option}`);
+        node.setAttribute("value", option);
+        option === initial ? node.setAttribute("selected", "selected") : null;
+        node.appendChild(textnode);
+        menu.appendChild(node);
+        return;
+    })
+};
+
+const update_main = function(value) {
+    return maintime = value;
+};
+
+const update_byox = function(value) {
+    return byox = value;
+}
+
+const update_byon = function(value) {
+    return byon = value;
+}
+
+const menu_init = function(settings) {
+    settings.map(category => {
+        let menu = document.querySelector(`${category.selector}`);
+        build_select_menu(menu, category.options, category.initial);
+        return
+    });
+
+    let start_button = document.querySelector('button.start');
+    start_button.addEventListener("click", startClick);
+};
+
+const startClick = function() {
+    game_init(maintime, byox, byon);
+}
+const set_defaults = function(settings) {
+    settings.map(category => window[category.name] = category.initial);
+}
+const settings = [
+
+    {
+        name: 'maintime',
+        options: [5,10,15,20,30,45],
+        initial: 10,
+        selector: '.maintime-optgroup'
+    },
+
+    {
+        name: 'byox',
+        options: [5,10],
+        initial: 5,
+        selector: '.byo-x-optgroup'
+    },
+    {
+        name: 'byon',
+        options: [10,20,30,45,60],
+        initial: 30,
+        selector: '.byo-n-optgroup'
+    }
+];
+
+
+set_defaults(settings);
+menu_init(settings);
+
+//init(maintime, byo_x, byo_n);
+</script>
+
+</html>
