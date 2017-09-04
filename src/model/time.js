@@ -1,5 +1,5 @@
 let m = require("mithril")
-let settings = require("./settings")
+let s = require("./settings")
 
 function Time(main, byo, byoN){
 	this.main = 60*main;
@@ -7,10 +7,14 @@ function Time(main, byo, byoN){
 	this.byoN = byoN;
 }
 
+let main = s.main
+let byo = s.byo
+let byoN = s.byoN
+
 let times = {
 
-	black: new Time(.1,5,5),
-	white: new Time(10,5,5),
+	black: new Time(main, byo, byoN),
+	white: new Time(main, byo, byoN),
 
 	count : function(player) {
 		let cur = times[player]
@@ -22,13 +26,6 @@ let times = {
 		} else if(cur.byoN === 0) {
 			return 'end';
 		}
-	
-// 	count: function(player, time) {
-
-
-// 		let current = times[player]
-// 		current[time] -= 1;
-// }
 }
 }
 module.exports = times
