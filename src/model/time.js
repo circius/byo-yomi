@@ -1,20 +1,16 @@
-let m = require("mithril")
-let s = require("./settings")
+const m = require("mithril")
+const s = require("./settings")
 
-function Time(main, byo, byoN){
+const times = {
+
+	black: {},
+	white: {},
+
+	time: function Time(main, byo, byoN){
 	this.main = 60*main;
 	this.byo = byo;
 	this.byoN = byoN;
-}
-
-let main = s.main
-let byo = s.byo
-let byoN = s.byoN
-
-let times = {
-
-	black: new Time(main, byo, byoN),
-	white: new Time(main, byo, byoN),
+},
 
 	count : function(player) {
 		let cur = times[player]

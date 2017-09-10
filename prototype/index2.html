@@ -1,0 +1,166 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>byo-yomi clock</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="player black">
+            <span class="maintime first-maintime">
+	10:00 
+	</span>
+            <span class="byo-yomi first-byo-yomi"> + 5 x 30s</span>
+        </div>
+        <div class="divider"> </div>
+        <div class="player white">
+            <span class="maintime second-maintime">
+	10:00
+	</span>
+            <span class="byo-yomi second-byo-yomi"> + 5 x 30s</span>
+        </div>
+</body>
+<style>
+body {
+    background: #eeeeee;
+}
+
+.container {
+    margin: 10%;
+    height: auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.player {
+    background: #aa77cc;
+    font-size: 14vw;
+    font-family: 'Helvetica neue', Helvetica, sans-serif;
+    padding: .2em;
+    border-radius: .2em;
+}
+
+.byo-yomi {
+    font-variant: small-caps;
+    font-size: 4vw;
+}
+
+.white {
+    background: #eeeeee;
+    color: #222222;
+    border: #222222;
+}
+
+.black {
+    background: #222222;
+    color: #eeeeee;
+}
+
+.divider {
+    height: auto;
+    min-width: 1em;
+}
+
+.current {
+    border: solid .1em;
+    border-color: #DE704F;
+}
+$
+</style>
+<script>
+
+function formatSecs(n) {
+    return n > 9 ? "" + n : "0" + n;
+}
+
+function formatMinSecs(n) {
+	const mins = Math.floor(n / 60);
+    const secs = formatSecs(n - mins * 60);
+    return(mins+":"+secs);
+}
+
+function formatByo(a) {
+	return ' +' + a[0] + 'x' + a[1] + 's';
+}
+
+function Clock(player, maintime, byo) {
+	this.player = player;
+	this.maintime = maintime;
+	this.byoN = byo[0];
+	this.byotime = byo[1]
+	this.mainClock = player.children[0];
+	this.byoClock = player.children[1];
+
+	this.writeClock = function (){
+		this.mainClock.innerHTML = formatMinSecs(this.maintime);
+		this.byoClock.innerHTML = formatByo([this.byoN, this.byotime]);
+	}
+
+	this.countDown = function () {
+		if (this.maintime > 0) {
+			this.maintime = this.maintime - 1;
+			this.writeClock();
+			return;
+		} else if (this.byoN > 0 && this.byotime > 0) {
+			this.byotime = this.byotime -1;
+			if (this.byotime === 0) {
+				this.resetByo();
+				this.byoN = this.byoN -1;
+				this.byoN === 0 ? alert('over!') : null;
+			}
+			this.writeClock();
+			return;
+	}
+
+}
+	this.resetByo = function (){
+		this.byotime = byo[1];
+		this.writeClock();
+	}
+}
+
+function clickHandle () {
+	updateClock(current);
+	return;
+}
+
+function counter () {
+	players[current].countDown();
+	return;
+}
+
+function switch_current  () {
+	current = window.current;
+	players[current].player.classList.remove("current");
+	players[current].resetByo();
+	current > 0 ? current = 0 : current = 1;
+	players[current].player.classList.add("current");
+	return;
+}
+
+ 
+const black = document.querySelector(".black");
+const white = document.querySelector(".white");
+
+const maintime = 10*60;
+const byo = [5,30]
+
+var blackClock = new Clock(black, maintime, byo);
+var whiteClock = new Clock(white, maintime, byo);
+
+blackClock.writeClock();
+whiteClock.writeClock();
+
+players = [blackClock, whiteClock];
+current = 0;
+players[current].player.classList.add("current");
+
+setInterval(counter, 1000);
+window.addEventListener('keyup', switch_current);
+window.addEventListener('touchend', switch_current)
+</script>
+
+</html>

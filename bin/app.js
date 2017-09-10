@@ -1309,10 +1309,68 @@ m.vnode = Vnode
 if (true) module["exports"] = m
 else window.m = m
 }());
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5).setImmediate, __webpack_require__(1)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5).setImmediate, __webpack_require__(3)))
 
 /***/ }),
 /* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+const m = __webpack_require__(0)
+
+let settings = {
+
+	players: ["black", "white"],
+	
+	timecats: ['main', 'byo', 'byoN'],
+	main: 10,
+	byo: 30,
+	byoN: 5,
+
+	main_options: [5,10,15,20,30,45],
+	byo_options: [10,30,60],
+	byoN_options: [5,10],
+
+	main_default: 10,
+	byo_default: 30,
+	byoN_default: 5
+}
+
+module.exports = settings
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+const m = __webpack_require__(0)
+const s = __webpack_require__(1)
+
+const times = {
+
+	black: {},
+	white: {},
+
+	time: function Time(main, byo, byoN){
+	this.main = 60*main;
+	this.byo = byo;
+	this.byoN = byoN;
+},
+
+	count : function(player) {
+		let cur = times[player]
+		if (cur.main > 0) {
+			cur.main -= 1;
+		} else if (cur.byoN > 0) {
+			cur.main = cur.byo;
+			cur.byoN -=1;
+		} else if(cur.byoN === 0) {
+			return 'end';
+		}
+}
+}
+module.exports = times
+
+/***/ }),
+/* 3 */
 /***/ (function(module, exports) {
 
 var g;
@@ -1339,87 +1397,26 @@ module.exports = g;
 
 
 /***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-const m = __webpack_require__(0);
-const time = __webpack_require__(3)
-
-const formatSecs = function (n) {
-	return n > 9? "" + n : "0" + n;
-}
-
-const formatMinSecs = function (n) {
-	const mins = Math.floor(n/60);
-	const secs = formatSecs(n - mins * 60);
-	return (mins + ":" + secs);
-}
-
-const formatByo = function (a) {
-	return '+' + a[0] + 'x' + a[1] + 's';
-}
-
-module.exports = {
-	view: function(vnode) {
-		const player = vnode.attrs.player;
-		const playerTime = time[player]
-		return m("."+player+'-clock', [
-			m(".main", formatMinSecs(playerTime.main)),
-			m(".byo", formatByo([playerTime.byoN, playerTime.byo]))
-			])
-	},
-}
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-let m = __webpack_require__(0)
-let settings = __webpack_require__(9)
-
-function Time(main, byo, byoN){
-	this.main = 60*main;
-	this.byo = byo;
-	this.byoN = byoN;
-}
-
-let times = {
-
-	black: new Time(.1,5,5),
-	white: new Time(10,5,5),
-
-	count : function(player) {
-		let cur = times[player]
-		if (cur.main > 0) {
-			cur.main -= 1;
-		} else if (cur.byoN > 0) {
-			cur.main = cur.byo;
-			cur.byoN -=1;
-		} else if(cur.byoN === 0) {
-			return 'end';
-		}
-	
-// 	count: function(player, time) {
-
-
-// 		let current = times[player]
-// 		current[time] -= 1;
-// }
-}
-}
-module.exports = times
-
-/***/ }),
 /* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 let m = __webpack_require__(0);
 
 let clocks = __webpack_require__(8);
-let clock = __webpack_require__(2)
-let menu = __webpack_require__(10);
+let menu = __webpack_require__(11);
 
-m.mount(document.body, clocks)
+m.route(document.body, "/menu", {
+	"/menu": {
+		view: () => {
+			return m(menu)
+		}
+	},
+	"/clocks": {
+		view: () => {
+			return m(clocks)
+		}
+	}
+})
 
 /***/ }),
 /* 5 */
@@ -1671,7 +1668,7 @@ exports.clearImmediate = clearImmediate;
     attachTo.clearImmediate = clearImmediate;
 }(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(7)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3), __webpack_require__(7)))
 
 /***/ }),
 /* 7 */
@@ -1867,48 +1864,170 @@ process.umask = function() { return 0; };
 /* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
-let m = __webpack_require__(0)
-const clock = __webpack_require__(2)
-const time = __webpack_require__(3)
+const m = __webpack_require__(0)
+const clock = __webpack_require__(9)
+const time = __webpack_require__(2)
+const s = __webpack_require__(1)
+const state = __webpack_require__(10)
+const players = state.players
 
-const players = ["black", "white"];
-let current = 0
+const init = function() {
+    window.addEventListener('keyup', clocks.switch)
+    window.addEventListener('touchend', clocks.switch)
 
-function counter(){
-	setInterval(function(){
-		let count = time.count('black')
-		if (count === 'end') {alert('zing')}
-		m.redraw()
-}, 1000)
+    time.black = new time.time(s.main, s.byo, s.byoN)
+    time.white = new time.time(s.main, s.byo, s.byoN)
+
+    state.counting = true;
+
+    setInterval(function() {
+        console.log(players[state.current])
+        if (state.counting === true) {
+            let count = time.count(players[state.current])
+            count === "end" ? alert(players[state.current] + " out of time") : null
+            m.redraw()
+        }
+    }, 1000)
 }
 
-module.exports = {
-	oninit: counter,
-	view: function() {
-		return m(".clocks", [
-			m(".black", m(clock, {player:"black"})),
-			m(".white", m(clock, {player:"white"})),
-		])
+const pause = {
+    view: function() {
+        return m("button", {
+            onclick: function() { state.counting ? state.counting = false : state.counting = true }
+        }, "Pause / Unpause")
+    }
 }
-};
+
+const exit = {
+    view: function() {
+        return m("button", {
+            onclick: function() {
+                window.location = "./index.html"
+                }}, 
+            'exit'
+    )
+}
+}
+
+
+const clocks = {
+    oninit: init,
+    switch: function() {
+        state.current === 0 ? state.current = 1 : state.current = 0
+    },
+
+    view: function() {
+        return m(".clocks", [
+            m(".black", m(clock, { player: "black" })),
+            m(".white", m(clock, { player: "white" })),
+            m(pause),
+            m(exit)
+        ])
+    }
+
+}
+
+module.exports = clocks
 
 /***/ }),
 /* 9 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
+const m = __webpack_require__(0);
+const time = __webpack_require__(2)
 
+const formatSecs = function (n) {
+	return n > 9? "" + n : "0" + n;
+}
+
+const formatMinSecs = function (n) {
+	const mins = Math.floor(n/60);
+	const secs = formatSecs(n - mins * 60);
+	return (mins + ":" + secs);
+}
+
+const formatByo = function (a) {
+	return '+' + a[0] + 'x' + a[1] + 's';
+}
+
+module.exports = {
+	view: function(vnode) {
+		const player = vnode.attrs.player;
+		const playerTime = time[player]
+		return m("."+player+'-clock', [
+			m(".main", formatMinSecs(playerTime.main)),
+			m(".byo", formatByo([playerTime.byoN, playerTime.byo]))
+			])
+	},
+}
 
 /***/ }),
 /* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
-let m = __webpack_require__(0)
+m = __webpack_require__(0)
+s = __webpack_require__(1)
 
-module.exports = {
+let state = {
+	current: 0,
+	players: s.players,
+	counting: false
+}
+
+module.exports = state
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+const m = __webpack_require__(0)
+const s = __webpack_require__(1)
+const t = __webpack_require__(2)
+
+const dropdown = {
+    view: function(vnode) {
+    	return m("select." + vnode.attrs.cat, {
+            onchange: updateSetting
+        },
+        [vnode.attrs.options.map(option => {
+            if (option === s[vnode.attrs.cat]){return m("option", {selected:"selected"}, option)}
+            return m("option", option)
+        })
+    ])
+}
+}
+
+const menu = {
+    view: function (vnode) {
+    	return m(".menu", vnode.attrs.cats.map(cat => {
+        return m("." + cat, cat + ":", m(dropdown, { cat: cat, options: s[cat + "_options"] } ) ) } )
+)}
+}
+
+const start = {
+	view: function(vnode) {
+    return m("a", {
+        href: "/clocks",
+        oncreate: m.route.link,
+    }, 'start')
+}
+}
+
+const updateSetting = function (e) {
+    s[e.target.className] = Number(e.target.value)
+}
+
+const main = {
 	view: function() {
-		return m(".menu", m)
+		return m('container', [
+			m(menu, {cats: s.timecats}),
+			m(start)
+			])
 	}
-};
+}
+
+module.exports = main
 
 /***/ })
 /******/ ]);
+//# sourceMappingURL=app.js.map
