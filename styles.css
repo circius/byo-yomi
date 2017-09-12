@@ -67,7 +67,9 @@ button {
 }
 
 .current {
-      padding: .2em;
+    padding: .2em;
+    border-style: solid;
+    border-width: .1em;
     border-radius: .2em;
     border-color: #DE704F;
 }
@@ -80,13 +82,17 @@ button {
     padding: 1em;
 }
 
-clock-button {
+.clock-button {
     margin-left: 1em;
     margin-right: 1em;
 }
 
-.menu-button {
+.start-button {
     color: black;
-    text-decoration: none;
-    
+    background-size: contain;
+    background-color: #darkblue;
+}
+
+.start-button:hover {
+    text-decoration-style:  double;
 }

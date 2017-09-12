@@ -2027,6 +2027,7 @@ const menu = {
                 m("span", "secs", m('br'))
                 ]),
             m("br"),
+            m("span",  "🡺"),
             m(start)
             ])
     }
@@ -2034,8 +2035,9 @@ const menu = {
 
 const start = {
 	view: function(vnode) {
-    return m("button", {
-        onclick: () => window.location = "./clocks" 
+    return m("a.start-button", {
+        href: "/clocks",
+        oncreate: m.route.link,
     }, 'start')
 }
 }
