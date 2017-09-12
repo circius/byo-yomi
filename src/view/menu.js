@@ -29,6 +29,7 @@ const menu = {
                 m(dropdown, {cat:'byo', options: s["byo_options"]}),
                 m("span", "secs", m('br'))
                 ]),
+            m("br"),
             m(start)
             ])
     }
@@ -36,9 +37,8 @@ const menu = {
 
 const start = {
 	view: function(vnode) {
-    return m("a", {
-        href: "/clocks",
-        oncreate: m.route.link,
+    return m("button", {
+        onclick: () => window.location = "./clocks" 
     }, 'start')
 }
 }

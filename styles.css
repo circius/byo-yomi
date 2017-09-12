@@ -67,18 +67,26 @@ button {
 }
 
 .current {
-    border: solid .1em;
+      padding: .2em;
+    border-radius: .2em;
     border-color: #DE704F;
 }
 
 .clocks-menu {
     display: flex;
     flex-flow:  row;
-    justify-content: center;
+    justify-content: right;
+    align-content: bottom;
     padding: 1em;
 }
 
-button {
+clock-button {
     margin-left: 1em;
     margin-right: 1em;
+}
+
+.menu-button {
+    color: black;
+    text-decoration: none;
+    
 }
