@@ -17,9 +17,21 @@ const dropdown = {
 
 const menu = {
     view: function (vnode) {
-    	return m(".menu", vnode.attrs.cats.map(cat => {
-        return m("." + cat, cat + ":", m(dropdown, { cat: cat, options: s[cat + "_options"] } ) ) } )
-)}
+    	return m(".menu", [
+            m(".menu-main", "main time: ", [
+                m(dropdown, {cat: 'main', options: s["main_options"]}),
+                m('span', 'mins'),
+                m("br")]),
+            m(".menu-byo", "byo-yomi: ", [
+                m('span', '+'),
+                m(dropdown, {cat: 'byoN', options: s["byoN_options"]}),
+                m("span", "x"),
+                m(dropdown, {cat:'byo', options: s["byo_options"]}),
+                m("span", "secs", m('br'))
+                ]),
+            m(start)
+            ])
+    }
 }
 
 const start = {
@@ -39,7 +51,6 @@ const main = {
 	view: function() {
 		return m('container', [
 			m(menu, {cats: s.timecats}),
-			m(start)
 			])
 	}
 }

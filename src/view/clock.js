@@ -21,7 +21,7 @@ module.exports = {
 		const playerTime = time[player]
 		return m("."+player+'-clock', [
 			m(".main", formatMinSecs(playerTime.main)),
-			m(".byo", formatByo([playerTime.byoN, playerTime.byo]))
+			m(".byo-yomi", formatByo([playerTime.byoN, playerTime.byo]))
 			])
 	},
 }

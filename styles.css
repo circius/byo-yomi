@@ -1,0 +1,84 @@
+body {
+    background: #eeeeee;
+    font-family: 'Helvetica neue', Helvetica, sans-serif;
+    font-size: 4vw;
+    font-variant: small-caps;
+}
+
+.menu {
+    height: 100vh;
+    width: 100vh;
+    position: fixed;
+    margin: 10%;
+    background: #eeeeee;
+    z-index: 2;
+    font-size: 4vw;
+    visibility: visible;
+}
+
+
+select,
+optgroup,
+button {
+    font-size: 4vw;
+    font-variant: small-caps;
+    border-radius: .2em;
+    display: ;
+}
+
+.container {
+	display: flex;
+	flex-direction: column;
+}
+
+.clocks {
+    margin: 10%;
+    height: auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.player {
+    font-size: 14vw;
+    padding: .2em;
+    border-radius: .2em;
+}
+
+.byo-yomi {
+    font-variant: small-caps;
+    font-size: 4vw;
+}
+
+.white {
+    background: #eeeeee;
+    color: #222222;
+    border: #222222;
+}
+
+.black {
+    background: #222222;
+    color: #eeeeee;
+}
+
+.divider {
+    height: auto;
+    min-width: 1em;
+}
+
+.current {
+    border: solid .1em;
+    border-color: #DE704F;
+}
+
+.clocks-menu {
+    display: flex;
+    flex-flow:  row;
+    justify-content: center;
+    padding: 1em;
+}
+
+button {
+    margin-left: 1em;
+    margin-right: 1em;
+}

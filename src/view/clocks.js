@@ -12,31 +12,36 @@ const init = function() {
     time.black = new time.time(s.main, s.byo, s.byoN)
     time.white = new time.time(s.main, s.byo, s.byoN)
 
-    state.counting = true;
-
     setInterval(function() {
-        console.log(players[state.current])
         if (state.counting === true) {
             let count = time.count(players[state.current])
-            count === "end" ? alert(players[state.current] + " out of time") : null
+            count === "end" ? out_of_time : null
             m.redraw()
         }
     }, 1000)
 }
 
-const pause = {
-    view: function() {
-        return m("button", {
-            onclick: function() { state.counting ? state.counting = false : state.counting = true }
-        }, "Pause / Unpause")
-    }
+const out_of_time = function () {
+    alert(players[state.current] + " out of time");
+    return window.location = "./index.html";
 }
 
-const exit = {
+const button_pause = {
     view: function() {
         return m("button", {
             onclick: function() {
-                window.location = "./index.html"
+                this.innerHTML === "pause" ? this.innerHTML = "unpause" : this.innerHTML = "pause"
+                state.counting ? state.counting = false : state.counting = true 
+            }
+        }, "pause")
+    }
+}
+
+const button_exit = {
+    view: function() {
+        return m("button", {
+            onclick: function() {
+                confirm("Quit?") ? window.location = "./index.html" : null
                 }}, 
             'exit'
     )
@@ -46,16 +51,26 @@ const exit = {
 
 const clocks = {
     oninit: init,
+    oncreate: function () {
+        document.querySelector(`.${players[state.current]}`).classList.toggle("current")
+        state.counting = true
+    },
     switch: function() {
+        document.querySelector(`.${players[state.current]}`).classList.toggle("current")
         state.current === 0 ? state.current = 1 : state.current = 0
+        document.querySelector(`.${players[state.current]}`).classList.toggle("current")
     },
 
     view: function() {
-        return m(".clocks", [
-            m(".black", m(clock, { player: "black" })),
-            m(".white", m(clock, { player: "white" })),
-            m(pause),
-            m(exit)
+        return m(".container", [
+            m(".clocks",[
+                m(".black.player", m(clock, { player: "black" })),
+                m(".white.player", m(clock, { player: "white" })),
+            ]),
+            m(".clocks-menu", [
+              m(button_pause),
+              m(button_exit)
+            ])
         ])
     }
 
