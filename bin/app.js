@@ -1872,8 +1872,6 @@ const state = __webpack_require__(10)
 const players = state.players
 
 const init = function() {
-    window.addEventListener('keyup', clocks.switch)
-    window.addEventListener('touchend', clocks.switch)
 
     time.black = new time.time(s.main, s.byo, s.byoN)
     time.white = new time.time(s.main, s.byo, s.byoN)
@@ -1887,17 +1885,17 @@ const init = function() {
     }, 1000)
 }
 
-const out_of_time = function () {
+const out_of_time = function() {
     alert(players[state.current] + " out of time");
     return window.location = "./index.html";
 }
 
 const button_pause = {
     view: function() {
-        return m("button", {
-            onclick: function() {
+        return m("button.clock-button", {
+            onmousedown: function() {
                 this.innerHTML === "pause" ? this.innerHTML = "unpause" : this.innerHTML = "pause"
-                state.counting ? state.counting = false : state.counting = true 
+                state.counting ? state.counting = false : state.counting = true
             }
         }, "pause")
     }
@@ -1905,19 +1903,22 @@ const button_pause = {
 
 const button_exit = {
     view: function() {
-        return m("button", {
-            onclick: function() {
-                confirm("Quit?") ? window.location = "./index.html" : null
-                }}, 
+        return m("button.clock-button", {
+                onmousedown: function() {
+                  confirm("Quit?") ? window.location = "./index.html" : null
+                }
+            },
             'exit'
-    )
-}
+        )
+    }
 }
 
 
 const clocks = {
     oninit: init,
-    oncreate: function () {
+    oncreate: function() {
+        document.addEventListener('keyup', clocks.switch)
+        document.querySelector(".clocks").addEventListener('touchend', clocks.switch)
         document.querySelector(`.${players[state.current]}`).classList.toggle("current")
         state.counting = true
     },
@@ -1929,13 +1930,13 @@ const clocks = {
 
     view: function() {
         return m(".container", [
-            m(".clocks",[
+            m(".clocks", [
                 m(".black.player", m(clock, { player: "black" })),
                 m(".white.player", m(clock, { player: "white" })),
             ]),
             m(".clocks-menu", [
-              m(button_pause),
-              m(button_exit)
+                m(button_pause),
+                m(button_exit)
             ])
         ])
     }
